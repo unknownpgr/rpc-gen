@@ -41,7 +41,7 @@ export function generate(
     }).then((res) => res.json());
     };`;
 
-  let backendFile = 'import { RpcContext } from "rpc/context";\n';
+  let backendFile = 'import { RpcContext } from "rpc-gen";\n';
   backendFile += `export const rpc = async (context:RpcContext, { module, func, hash, args }: { module: string, func: string, hash: number, args: any[] }) => {
     const moduleObj = modules[module];
     if (!moduleObj) throw new Error("Module not found");
