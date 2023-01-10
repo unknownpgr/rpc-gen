@@ -15,7 +15,7 @@ export interface RpcGenConfig {
 
 export function generate(
   config: RpcGenConfig = {
-    rpcApiUrl: "api/rpc",
+    rpcApiUrl: "/api/rpc",
     frontendFile: "./frontend.rpc.ts",
     backendFile: "./backend.rpc.ts",
   }

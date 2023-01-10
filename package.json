@@ -12,7 +12,8 @@
   "homepage": "https://github.com/unknownpgr/rpc",
   "scripts": {
     "build": "tsc",
-    "preversion": "yarn build; git add -A lib; git diff-index --quiet HEAD || git commit -m \"build\""
+    "preversion": "yarn build; git add -A lib; git diff-index --quiet HEAD || git commit -m \"build\"",
+    "patch": "git add .; git diff-index --quiet HEAD || git commit -m \"patch\"; npm version patch; npm publish"
   },
   "dependencies": {
     "@types/node": "^18.11.18",

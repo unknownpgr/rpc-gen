@@ -8,6 +8,6 @@
     "rpc": "rpc-gen"
   },
   "dependencies": {
-    "rpc-gen": "^1.0.2"
+    "rpc-gen": "^1.0.7"
   }
 }

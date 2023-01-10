@@ -156,10 +156,10 @@ reusify@^1.0.4:
   resolved "https://registry.npmjs.org/reusify/-/reusify-1.0.4.tgz"
   integrity sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
 
-rpc-gen@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/rpc-gen/-/rpc-gen-1.0.2.tgz#d8a22edd91cacab4fa23290e950a97f5a1f51265"
-  integrity sha512-YnLWtGvo2ai9sP8Arc6JZ2/koZE+2HSgtCU96bYvG3vdqljLC8NDoyXzXGYJGEEzBjqVnSeRTasu8vTLr4IEvg==
+rpc-gen@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/rpc-gen/-/rpc-gen-1.0.7.tgz#44a440df41be4a4d89d1d109f05647b75b36ffd7"
+  integrity sha512-Z+rY5OL5xgUtL0AnXFeMp7yHbtiJDFJadM3bVXHjq4EBxaPJ4yqx7CGVuRXkT4Es9d+7TVbHSDo1+T4pYPa2Aw==
   dependencies:
     "@types/node" "^18.11.18"
     ts-morph "^17.0.1"
