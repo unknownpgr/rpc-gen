@@ -103,35 +103,25 @@ export function resolveType(
       return "any";
     }
 
-    // Check if type is primitive
+    // Check if type is native type
     if (
       type.isString() ||
       type.isNumber() ||
       type.isBoolean() ||
       type.isUndefined() ||
-      type.isNull()
+      type.isNull() ||
+      type.isBooleanLiteral() ||
+      type.isStringLiteral() ||
+      type.isEnum() ||
+      type.isNever() ||
+      isNativeType(type)
     ) {
-      return type.getText();
-    }
-
-    // If type is literal, return the literal value.
-    if (type.isBooleanLiteral() || type.isStringLiteral()) {
       return type.getText();
     }
 
     // If type is literal, return the literal value.
     if (type.isLiteral()) {
       return type.getLiteralValueOrThrow().toString();
-    }
-
-    // If type is enum, return the enum value.
-    if (type.isEnum()) {
-      return type.getText();
-    }
-
-    // If type is javascript native class, return the type.
-    if (isNativeType(type)) {
-      return type.getText();
     }
 
     // If type is promise, get the type of the promise.
