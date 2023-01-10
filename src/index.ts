@@ -5,14 +5,16 @@ import { TypeFormatFlags } from "typescript";
 import { getFunctionDeclarations } from "./getFunctionDeclarations";
 import { resolveType } from "./resolver";
 
-interface Config {
+export interface RpcContext {}
+
+export interface RpcGenConfig {
   rpcApiUrl: string;
   frontendFile: string;
   backendFile: string;
 }
 
-function generate(
-  config: Config = {
+export function generate(
+  config: RpcGenConfig = {
     rpcApiUrl: "api/rpc",
     frontendFile: "./frontend.rpc.ts",
     backendFile: "./backend.rpc.ts",
