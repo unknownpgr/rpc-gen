@@ -1,5 +1,6 @@
-example
-index.ts
 .devcontainer
+.vscode
+example
+.gitignore
 tsconfig.json
-patch.sh
+src
