@@ -1,5 +1,5 @@
 import { RpcContext } from "rpc-gen";
-import { TypeFromOtherFile } from "./test-type";
+import { TypeFromOtherFile } from "../test-type";
 
 interface NotExportedInterface {
   name: string;
@@ -40,8 +40,11 @@ export function testRpcCall2(
   };
 }
 
-export function testRpcCall3(context: RpcContext, param: TypeFromOtherFile) {
+export async function testRpcCall3(
+  context: RpcContext,
+  param: TypeFromOtherFile
+) {
   return param;
 }
 
-export function notExportedRpcCall(context: RpcContext) {}
+function notExportedRpcCall(context: RpcContext) {}
