@@ -1,8 +1,8 @@
 {
-  "name": "@unknownpgr/rpc-gen",
+  "name": "rpc-gen",
   "version": "1.0.0",
   "description": "Solution for generating RPC code from TypeScript code",
-  "main": "index.js",
+  "main": "lib/index.js",
   "license": "MIT",
   "bin": "cli.js",
   "repository": {
