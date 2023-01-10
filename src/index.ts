@@ -1,3 +1,4 @@
+import args from "args";
 import crypto from "crypto";
 import fs from "fs";
 import { Project } from "ts-morph";
@@ -13,13 +14,7 @@ export interface RpcGenConfig {
   backendFile: string;
 }
 
-export function generate(
-  config: RpcGenConfig = {
-    rpcApiUrl: "/api/rpc",
-    frontendFile: "./frontend.rpc.ts",
-    backendFile: "./backend.rpc.ts",
-  }
-) {
+export function generate(config: RpcGenConfig) {
   console.log("Loading project files...");
   const project = new Project({
     tsConfigFilePath: "tsconfig.json",
@@ -170,5 +165,11 @@ export function generate(
 }
 
 export function cli() {
-  generate();
+  args
+    .option("rpcApiUrl", "URL of RPC API", "/api/rpc")
+    .option("frontendFile", "Path to frontend file", "./frontend.rpc.ts")
+    .option("backendFile", "Path to backend file", "./backend.rpc.ts");
+
+  const config = args.parse(process.argv) as RpcGenConfig;
+  generate(config);
 }
