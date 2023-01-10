@@ -1,4 +1,4 @@
-import { RpcContext } from "rpc-gen/lib/context";
+import { RpcContext } from "rpc-gen";
 import { TypeFromOtherFile } from "./test-type";
 
 interface NotExportedInterface {
@@ -6,7 +6,7 @@ interface NotExportedInterface {
   value: number;
 }
 
-interface ExportedInterface {
+export interface ExportedInterface {
   key: string;
   test: NotExportedInterface;
 }
@@ -24,7 +24,7 @@ export function testRpcCall1(
   return {
     key: "test",
     test: {
-      name: "test",
+      name: test.prop1.name,
       value: 1,
     },
   };
