@@ -48,10 +48,10 @@ export function generate(
     const funcObj = moduleObj[func];
     if (!funcObj) throw new Error("Function not found");
     if (funcObj.hash !== hash) throw new Error("Hash mismatch");
-    return funcObj.func(context, ...args);
+    return await funcObj.func(context, ...args);
     };`;
   backendFile +=
-    "const modules: { [key: string]: { [key: string]: { hash: number, func: (...args: any[]) => Promise<any> } }} = {\n";
+    "const modules: { [key: string]: { [key: string]: { hash: number, func: (...args: any[]) => any } }} = {\n";
 
   const backendImports = [];
   const moduleNames = new Set<string>();
@@ -104,7 +104,7 @@ export function generate(
       // Assert the type of first parameter is RpcContext.
       if (!firstParameter) {
         throw new Error(
-          `Invalid api function declaration: ${moduleName}.${functionName}. There must be at least one parameter.`
+          `Invalid api function declaration: ${moduleName}.${functionName}. There must be at least one RpcContext type parameter.`
         );
       }
 
@@ -137,8 +137,12 @@ export function generate(
             `${param.getName()}: ${resolveType(param.getType(), resolvedTypes)}`
         )
         .join(", ");
-      const resolvedReturnType = resolveType(returnType, resolvedTypes);
-      frontendFile += `  ${funcName}: async (${funcParamsWithTypes}): Promise<${resolvedReturnType}> => rpc("${moduleName}", "${funcName}", ${hashInt}, [${funcParams}]),\n`;
+      let resolvedReturnType = resolveType(returnType, resolvedTypes);
+      // If resolvedReturnType is not Promise, wrap it wih promise.
+      if (!resolvedReturnType.startsWith("Promise<")) {
+        resolvedReturnType = `Promise<${resolvedReturnType}>`;
+      }
+      frontendFile += `  ${funcName}: async (${funcParamsWithTypes}): ${resolvedReturnType} => rpc("${moduleName}", "${funcName}", ${hashInt}, [${funcParams}]),\n`;
 
       // Generate function declaration for backend.
       backendFile += `    ${funcName}: { hash: ${hashInt}, func: ${moduleName}.${funcName} },\n`;

@@ -48,9 +48,6 @@ const allowedDeclarationKinds = [
 function getDeclaration(
   node: Node<ts.Node>
 ): InterfaceDeclaration | TypeAliasDeclaration | null {
-  console.log(node.getText());
-  console.log("---");
-
   const kind = node.getKind();
   if (allowedDeclarationKinds.includes(kind)) {
     return node as any;
