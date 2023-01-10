@@ -1,0 +1,27 @@
+{
+  "name": "@unknownpgr/rpc-gen",
+  "version": "2.1.0",
+  "description": "Solution for generating RPC code from TypeScript code",
+  "main": "index.js",
+  "license": "MIT",
+  "bin": "cli.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unknownpgr/rpc"
+  },
+  "homepage": "https://github.com/unknownpgr/rpc",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@types/node": "^18.11.18",
+    "ts-morph": "^17.0.1",
+    "typescript": "^4.9.4"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "typescript",
+    "rpc",
+    "autogenerate"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "rpc-gen",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:16-bullseye",
+  "extensions": [
+    "esbenp.prettier-vscode",
+    "mhutchie.git-graph",
+    "streetsidesoftware.code-spell-checker",
+    "GitHub.copilot"
+  ]
+}
