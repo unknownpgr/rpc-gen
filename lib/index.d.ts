@@ -5,5 +5,5 @@ export interface RpcGenConfig {
     frontendFile: string;
     backendFile: string;
 }
-export declare function generate(config?: RpcGenConfig): void;
+export declare function generate(config: RpcGenConfig): void;
 export declare function cli(): void;
