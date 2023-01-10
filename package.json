@@ -12,7 +12,7 @@
   "homepage": "https://github.com/unknownpgr/rpc",
   "scripts": {
     "build": "tsc",
-    "preversion": "yarn build; git add -A lib; git commit -m \"build\""
+    "preversion": "yarn build; git add -A lib; git diff-index --quiet HEAD || git commit -m \"build\""
   },
   "dependencies": {
     "@types/node": "^18.11.18",
