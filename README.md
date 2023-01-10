@@ -1,6 +1,14 @@
 # Rpc-Gen
 
-Rpc-Gen is a tool to generate typescript RPC code for your project.
+Rpc-Gen is a tool to auto-generate typescript RPC code for your project.
+
+Define function at backend
+
+![a.png](/assets/a.png)
+
+and use it at frontend
+
+![b.png](/assets/b.png)
 
 ## Installation
 
