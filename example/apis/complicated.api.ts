@@ -16,6 +16,11 @@ interface TestInterface {
   prop2: ExportedInterface;
 }
 
+export type CustomGenericType<T> = {
+  name: string;
+  value: T;
+};
+
 export function testRpcCall1(
   context: RpcContext,
   test: TestInterface
@@ -43,6 +48,27 @@ export function testRpcCall2(
 export async function testRpcCall3(
   context: RpcContext,
   param: TypeFromOtherFile
+) {
+  return param;
+}
+
+export async function testRpcCall4(
+  context: RpcContext,
+  param: CustomGenericType<TypeFromOtherFile>
+) {
+  return param;
+}
+
+export async function testRpcCall5(
+  context: RpcContext,
+  param: CustomGenericType<CustomGenericType<TypeFromOtherFile>>
+) {
+  return param;
+}
+
+export async function testRpcCall6(
+  context: RpcContext,
+  param: CustomGenericType<number>
 ) {
   return param;
 }
