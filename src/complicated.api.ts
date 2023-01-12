@@ -1,5 +1,4 @@
-import { RpcContext } from "rpc-gen";
-import { TypeFromOtherFile } from "../test-type";
+import { RpcContext } from ".";
 
 interface NotExportedInterface {
   name: string;
@@ -25,7 +24,7 @@ export function testRpcCall1(
   context: RpcContext,
   test: TestInterface
 ): ExportedInterface {
-  console.log(context.name);
+  console.log(context);
   return {
     key: "test",
     test: {
@@ -40,28 +39,21 @@ export function testRpcCall2(
   value: number
 ): NotExportedInterface {
   return {
-    name: context.name,
+    name: `context: ${context}`,
     value,
   };
 }
 
-export async function testRpcCall3(
-  context: RpcContext,
-  param: TypeFromOtherFile
-) {
-  return param;
-}
-
 export async function testRpcCall4(
   context: RpcContext,
-  param: CustomGenericType<TypeFromOtherFile>
+  param: CustomGenericType<NotExportedInterface>
 ) {
   return param;
 }
 
 export async function testRpcCall5(
   context: RpcContext,
-  param: CustomGenericType<CustomGenericType<TypeFromOtherFile>>
+  param: CustomGenericType<CustomGenericType<NotExportedInterface>>
 ) {
   return param;
 }

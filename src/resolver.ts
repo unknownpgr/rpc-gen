@@ -1,3 +1,5 @@
+import * as ts from "typescript";
+
 import {
   InterfaceDeclaration,
   Node,
@@ -5,7 +7,6 @@ import {
   Type,
   TypeAliasDeclaration,
 } from "ts-morph";
-import * as ts from "typescript";
 
 // Check if given type is promise
 function isPromise(type: Type) {
@@ -34,6 +35,11 @@ function isNativeType(type: Type) {
 // Check if given type is callable
 function isCallable(type: Type) {
   return type.getCallSignatures().length > 0;
+}
+
+// Check if given type has generic arguments
+function hasGenericArguments(type: Type) {
+  return type.getAliasTypeArguments().length > 0;
 }
 
 const UNRESOLVABLE = "*UNRESOLVABLE*";
@@ -65,7 +71,15 @@ function getTypeName(type: Type<ts.Type>): string {
   const declaration = symbol.getDeclarations()[0];
   const namedDeclaration = getDeclaration(declaration);
   if (namedDeclaration) {
-    return namedDeclaration.getName();
+    if (!hasGenericArguments(type)) return namedDeclaration.getName();
+
+    /**
+     * Resolving generic is quite tricky. We need to resolve all generic arguments
+     * TODO: What if resolved type text cannot be an valid identifier? (e.g. `type A = { a: string }`)
+     */
+    const args = type.getAliasTypeArguments();
+    const argNames = args.map((arg) => resolveType(arg));
+    return `${namedDeclaration.getName()}_${argNames.join("_")}`;
   }
   return UNRESOLVABLE;
 }
