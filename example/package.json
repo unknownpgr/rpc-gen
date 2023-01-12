@@ -5,14 +5,14 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "refresh": "yarn remove rpc-gen && yarn add rpc-gen",
+    "refresh": "yarn remove rpc-gen && yarn add -D rpc-gen",
     "rpc": "rpc-gen"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "rpc-gen": "^1.0.8"
+    "express": "^4.18.2"
   },
   "devDependencies": {
-    "@types/express": "^4.17.15"
+    "@types/express": "^4.17.15",
+    "rpc-gen": "^1.0.13"
   }
 }

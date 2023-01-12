@@ -65,6 +65,15 @@ function getDeclaration(
   return null;
 }
 
+function isValidIdentifier(name: string) {
+  return /^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(name);
+}
+
+let counter = 0;
+function getUniqueName() {
+  return `__${counter++}`;
+}
+
 function getTypeName(type: Type<ts.Type>): string {
   const symbol = type.getSymbol();
   if (!symbol) return UNRESOLVABLE;
@@ -79,7 +88,9 @@ function getTypeName(type: Type<ts.Type>): string {
      */
     const args = type.getAliasTypeArguments();
     const argNames = args.map((arg) => resolveType(arg));
-    return `${namedDeclaration.getName()}_${argNames.join("_")}`;
+    return `${namedDeclaration.getName()}_${argNames
+      .map((arg) => (isValidIdentifier(arg) ? arg : getUniqueName()))
+      .join("_")}`;
   }
   return UNRESOLVABLE;
 }
