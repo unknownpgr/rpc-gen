@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "refresh": "yarn remove rpc-gen && yarn add rpc-gen",
     "rpc": "rpc-gen"
   },
   "dependencies": {
