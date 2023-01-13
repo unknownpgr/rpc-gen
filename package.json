@@ -12,16 +12,16 @@
   "homepage": "https://github.com/unknownpgr/rpc",
   "scripts": {
     "build": "tsc",
-    "preversion": "yarn build; git add -A lib; git diff-index --quiet HEAD || git commit -m \"build\"",
+    "preversion": "rm -rf lib; yarn build; git add -A lib; git diff-index --quiet HEAD || git commit -m \"build\"",
     "patch": "git add .; git diff-index --quiet HEAD || git commit -m \"patch\"; npm version patch"
   },
   "dependencies": {
-    "@types/node": "^18.11.18",
     "args": "^5.0.3",
     "ts-morph": "^17.0.1",
     "typescript": "^4.9.4"
   },
   "devDependencies": {
+    "@types/node": "^18.11.18",
     "@types/args": "^5.0.0"
   },
   "keywords": [
