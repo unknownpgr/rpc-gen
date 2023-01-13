@@ -154,23 +154,27 @@ export function resolveType(
       return `Promise<${resolve(type.getTypeArguments()[0], nextStack)}>`;
     }
 
-    const ret = (typeText: string) => {
-      if (typeName !== UNRESOLVABLE) {
-        resolvedTypes[typeName] = typeText;
-        return typeName;
-      } else return typeText;
-    };
-
     // If type is array, get the type of the array.
     if (type.isArray()) {
+      // It seems like array is not regarded as generic type.
+      // Therefore type name of every array type is always `Array`.
+      // Therefore, resolved type should never be cached.
+
       const resolvedType = resolve(
         type.getArrayElementTypeOrThrow(),
         nextStack
       );
       if (resolvedType === "never" || resolvedType === "undefined")
         return resolvedType;
-      return ret(`${resolvedType}[]`);
+      return `${resolvedType}[]`;
     }
+
+    const ret = (typeText: string) => {
+      if (typeName !== UNRESOLVABLE) {
+        resolvedTypes[typeName] = typeText;
+        return typeName;
+      } else return typeText;
+    };
 
     // If type is union, resolve the type of each union.
     if (type.isUnion()) {
