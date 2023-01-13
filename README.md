@@ -146,20 +146,20 @@ yarn add rpc-gen
 
 ## Docs
 
- ```bash
-   Usage: rpc gen [options] [command]
+```bash
+  Usage: rpc gen [options] [command]
 
-   Commands:
-     help     Display help
-     version  Display version
+  Commands:
+    help     Display help
+    version  Display version
 
-   Options:
-     -b, --backendFile [value]   Path to backend file (defaults to "./backend.rpc.ts")
-     -f, --frontendFile [value]  Path to frontend file (defaults to "./frontend.rpc.ts")
-     -h, --help                  Output usage information
-     -r, --rpcApiUrl [value]     URL of RPC API (defaults to "/api/rpc")
-     -v, --version               Output the version number
- ```
+  Options:
+    -b, --backendFile [value]   Path to backend file (defaults to "./backend.rpc.ts")
+    -f, --frontendFile [value]  Path to frontend file (defaults to "./frontend.rpc.ts")
+    -h, --help                  Output usage information
+    -r, --rpcApiUrl [value]     URL of RPC API (defaults to "/api/rpc")
+    -v, --version               Output the version number
+```
 
 ## Contributing
 
