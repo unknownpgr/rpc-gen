@@ -14,9 +14,9 @@ and use it at frontend
 
 ```bash
 # Install with npm
-npm install --save-dev rpc-gen
+npm install rpc-gen
 # Or install with yarn
-yarn add --D rpc-gen
+yarn add rpc-gen
 ```
 
 ## Usage
