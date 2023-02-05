@@ -1,240 +1,65 @@
-import * as ts from "typescript";
+import { ts, Type, TypeFormatFlags } from "ts-morph";
 
-import {
-  InterfaceDeclaration,
-  Node,
-  SyntaxKind,
-  Type,
-  TypeAliasDeclaration,
-} from "ts-morph";
-
-// Check if given type is promise
-function isPromise(type: Type) {
-  const symbol = type.getSymbol();
-  if (!type.isObject() || !symbol) {
-    return false;
+function getTypeDeclaration(type: Type) {
+  // Check if type is primitive
+  if (type.isString() || type.isNumber() || type.isBoolean()) {
+    return type.getText();
   }
-  const args = type.getTypeArguments();
-  return symbol.getName() === "Promise" && args.length === 1;
-}
 
-// Check if given type is javascript native class such as Date, Error, Regex, etc.
-function isNativeType(type: Type) {
-  return (
-    type.isClassOrInterface() &&
-    type
-      .getSymbolOrThrow()
-      .getDeclarations()
-      .some(
-        (declaration) =>
-          declaration.getSourceFile().getBaseName() === "lib.es5.d.ts"
-      )
-  );
-}
-
-// Check if given type is callable
-function isCallable(type: Type) {
-  return type.getCallSignatures().length > 0;
-}
-
-// Check if given type has generic arguments
-function hasGenericArguments(type: Type) {
-  return type.getAliasTypeArguments().length > 0;
-}
-
-const UNRESOLVABLE = "*UNRESOLVABLE*";
-
-const allowedDeclarationKinds = [
-  SyntaxKind.InterfaceDeclaration,
-  SyntaxKind.TypeAliasDeclaration,
-  // SyntaxKind.ClassDeclaration,
-  // SyntaxKind.EnumDeclaration,
-];
-
-function getDeclaration(
-  node: Node<ts.Node>
-): InterfaceDeclaration | TypeAliasDeclaration | null {
-  const kind = node.getKind();
-  if (allowedDeclarationKinds.includes(kind)) {
-    return node as any;
-  }
-  return null;
-}
-
-function isValidIdentifier(name: string) {
-  return /^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(name);
-}
-
-let counter = 0;
-function getUniqueName() {
-  return `__${counter++}`;
-}
-
-function getTypeName(type: Type<ts.Type>): string {
   const symbol = type.getSymbol();
-  if (!symbol) return UNRESOLVABLE;
+  if (!symbol) return UNRESOLVED;
+
   const declaration = symbol.getDeclarations()[0];
-  const namedDeclaration = getDeclaration(declaration);
-  if (namedDeclaration) {
-    if (!hasGenericArguments(type)) return namedDeclaration.getName();
 
-    /**
-     * Resolving generic is quite tricky. We need to resolve all generic arguments
-     * TODO: What if resolved type text cannot be an valid identifier? (e.g. `type A = { a: string }`)
-     */
-    const args = type.getAliasTypeArguments();
-    const argNames = args.map((arg) => resolveType(arg));
-    return `${namedDeclaration.getName()}_${argNames
-      .map((arg) => (isValidIdentifier(arg) ? arg : getUniqueName()))
-      .join("_")}`;
+  // Check if given declaration is an interface
+  if (declaration?.getKind() === ts.SyntaxKind.InterfaceDeclaration) {
+    return declaration.getText();
   }
-  return UNRESOLVABLE;
+
+  // Check if given declaration is a type alias
+  if (declaration?.getKind() === ts.SyntaxKind.TypeAliasDeclaration) {
+    return declaration.getText();
+  }
+
+  return UNRESOLVED;
 }
+
+const UNRESOLVED = "UNRESOLVED";
 
 export function resolveType(
   type: Type<ts.Type>,
-  resolvedTypes: Record<string, string> = {}
-): string {
-  function resolve(type: Type<ts.Type>, stack: Type<ts.Type>[]): string {
-    const typeName = getTypeName(type);
-
-    // Check if type is already resolved
-    if (typeName !== UNRESOLVABLE && typeName in resolvedTypes) {
-      return typeName;
-    }
-
-    // Check if type is recursive
-    if (stack.includes(type)) {
-      console.error("Given type is recursive. Returning 'any' instead.");
-      return "any";
-    }
-
-    // Check if type is too deep
-    if (stack.length > 20) {
-      console.error(
-        "Given type is too deeply nested. Returning 'any' instead."
-      );
-      return "any";
-    }
-
-    const nextStack = stack.concat(type);
-
-    // Check if type is any
-    if (type.isAny()) {
-      return "any";
-    }
-
-    // Check if type is native type
-    if (
-      type.isString() ||
-      type.isNumber() ||
-      type.isBoolean() ||
-      type.isUndefined() ||
-      type.isNull() ||
-      type.isBooleanLiteral() ||
-      type.isStringLiteral() ||
-      type.isEnum() ||
-      type.isNever() ||
-      isNativeType(type)
-    ) {
-      return type.getText();
-    }
-
-    // If type is literal, return the literal value.
-    if (type.isLiteral()) {
-      return type.getLiteralValueOrThrow().toString();
-    }
-
-    // If type is promise, get the type of the promise.
-    if (isPromise(type)) {
-      return `Promise<${resolve(type.getTypeArguments()[0], nextStack)}>`;
-    }
-
-    // If type is array, get the type of the array.
-    if (type.isArray()) {
-      // It seems like array is not regarded as generic type.
-      // Therefore type name of every array type is always `Array`.
-      // Therefore, resolved type should never be cached.
-
-      const resolvedType = resolve(
-        type.getArrayElementTypeOrThrow(),
-        nextStack
-      );
-      if (resolvedType === "never" || resolvedType === "undefined")
-        return resolvedType;
-      return `${resolvedType}[]`;
-    }
-
-    const ret = (typeText: string) => {
-      if (typeName !== UNRESOLVABLE) {
-        resolvedTypes[typeName] = typeText;
-        return typeName;
-      } else return typeText;
-    };
-
-    // If type is union, resolve the type of each union.
-    if (type.isUnion()) {
-      const unionTypes = type.getUnionTypes();
-      const resolvedUnionTypes = unionTypes
-        .map((unionType) => resolve(unionType, nextStack))
-        .filter((type) => type !== "never");
-      if (resolvedUnionTypes.length === 0) return "never";
-      return ret(resolvedUnionTypes.join(" | "));
-    }
-
-    // If type is intersection, resolve the type of each intersection.
-    if (type.isIntersection()) {
-      const intersectionTypes = type.getIntersectionTypes();
-      const resolvedIntersectionTypes = intersectionTypes
-        .map((intersectionType) => resolve(intersectionType, nextStack))
-        .filter((type) => type !== "never");
-      if (resolvedIntersectionTypes.length === 0) return "never";
-      return ret(resolvedIntersectionTypes.join(" & "));
-    }
-
-    // If type is tuple, resolve the type of each item.
-    if (type.isTuple()) {
-      const tupleTypes = type.getTupleElements();
-      const resolvedTupleTypes = tupleTypes.map((tupleType) =>
-        resolve(tupleType, nextStack)
-      );
-      return ret(`[${resolvedTupleTypes.join(", ")}]`);
-    }
-    // If type is callable, return undefined because function cannot be serialized.
-    if (isCallable(type)) {
-      console.error("Function type detected. Returning 'undefined' instead.");
-      console.error(
-        "Because any function including toString will be undefined when serialized, Generated frontend code may not work as expected."
-      );
-      return "undefined";
-    }
-
-    // If type is object, resolve the type of each property.
-    // Because many types, including function, are object, this should be the last check.
-    if (type.isObject()) {
-      const properties = type.getProperties();
-      const resolvedProperties = properties
-        .map((property) => {
-          const propertyType = property.getTypeAtLocation(
-            property.getDeclarations()[0]
-          );
-          const resolvedType = resolve(propertyType, nextStack);
-          // Ignore undefined property
-          if (resolvedType === "undefined") return "";
-          return `"${property.getName()}": ${resolvedType}`;
-        })
-        .filter((property) => property.length > 0);
-      // Consider empty object as undefined
-      if (resolvedProperties.length === 0) return "undefined";
-      return ret(`{${resolvedProperties.join(", ")}}`);
-    }
-
-    // If type is unknown, return any.
-    console.error(
-      `Unknown type (${type.getText()}) detected. Returning 'any' instead.`
-    );
-    return "any";
+  declarations: { [key: string]: string }
+) {
+  const typeText = type.getText(undefined, TypeFormatFlags.NoTypeReduction);
+  console.log("typeText", typeText);
+  if (declarations[typeText] && declarations[typeText] !== UNRESOLVED)
+    return typeText;
+  const declaration = getTypeDeclaration(type);
+  console.log("declaration", declaration);
+  if (declaration !== UNRESOLVED && declaration.startsWith("export")) {
+    declarations[typeText] = declaration;
+    console.log(typeText);
+    console.log(declaration);
   }
 
-  return resolve(type, []);
+  if (type.isIntersection()) {
+    for (const t of type.getIntersectionTypes()) {
+      resolveType(t, declarations);
+    }
+  }
+  if (type.isUnion()) {
+    for (const t of type.getUnionTypes()) {
+      resolveType(t, declarations);
+    }
+  }
+  if (type.isObject()) {
+    for (const property of type.getProperties()) {
+      const propertyType = property.getTypeAtLocation(
+        property.getDeclarations()[0]
+      );
+      resolveType(propertyType, declarations);
+    }
+  }
+
+  return typeText;
 }

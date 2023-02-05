@@ -1,7 +1,12 @@
 import args from "args";
 import crypto from "crypto";
 import fs from "fs";
-import { Project } from "ts-morph";
+import {
+  ModuleKind,
+  ModuleResolutionKind,
+  Project,
+  ScriptTarget,
+} from "ts-morph";
 import { TypeFormatFlags } from "typescript";
 import { getFunctionDeclarations } from "./getFunctionDeclarations";
 import { resolveType } from "./resolver";
@@ -17,8 +22,21 @@ export interface RpcGenConfig {
 export function generate(config: RpcGenConfig) {
   console.log("Loading project files...");
   const project = new Project({
-    tsConfigFilePath: "tsconfig.json",
+    compilerOptions: {
+      esModuleInterop: true,
+      moduleResolution: ModuleResolutionKind.NodeJs,
+      module: ModuleKind.CommonJS,
+      target: ScriptTarget.ES2020,
+      baseUrl: "./",
+      noImplicitAny: true,
+      strictNullChecks: true,
+      noImplicitThis: true,
+      alwaysStrict: true,
+      declaration: true,
+    },
   });
+  project.addSourceFilesAtPaths("**/*{.d.ts,.ts}");
+  project.resolveSourceFileDependencies();
   const checker = project.getTypeChecker();
 
   let frontendFile = `const rpc = async (module: string, func: string, hash: number, args: any[]) => {
@@ -152,7 +170,7 @@ export function generate(config: RpcGenConfig) {
 
   // Add resolved types to frontend file.
   frontendFile += Object.entries(resolvedTypes)
-    .map(([key, value]) => `export type ${key} = ${value};`)
+    .map(([key, value]) => `${value};`)
     .join("\n");
 
   console.log("Writing files...");

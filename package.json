@@ -21,8 +21,9 @@
     "typescript": "^4.9.4"
   },
   "devDependencies": {
+    "@types/args": "^5.0.0",
     "@types/node": "^18.11.18",
-    "@types/args": "^5.0.0"
+    "ts-node": "^10.9.1"
   },
   "keywords": [
     "typescript",
