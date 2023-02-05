@@ -58,10 +58,6 @@ function getDeclaration(
   if (allowedDeclarationKinds.includes(kind)) {
     return node as any;
   }
-  const parent = node.getParent();
-  if (parent) {
-    return getDeclaration(parent);
-  }
   return null;
 }
 
