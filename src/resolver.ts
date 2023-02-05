@@ -1,10 +1,13 @@
-import { ts, Type, TypeFormatFlags } from "ts-morph";
+import { InterfaceDeclaration, ts, Type, TypeFormatFlags } from "ts-morph";
 
 function getTypeDeclaration(type: Type) {
   // Check if type is primitive
   if (type.isString() || type.isNumber() || type.isBoolean()) {
-    return type.getText();
+    return UNRESOLVED;
   }
+
+  // Check if type is promise
+  if (type.getText().startsWith("Promise<")) return UNRESOLVED;
 
   const symbol = type.getSymbol();
   if (!symbol) return UNRESOLVED;
@@ -16,9 +19,14 @@ function getTypeDeclaration(type: Type) {
     return declaration.getText();
   }
 
-  // Check if given declaration is a type alias
-  if (declaration?.getKind() === ts.SyntaxKind.TypeAliasDeclaration) {
-    return declaration.getText();
+  // Check if given declaration is a type literal
+  if (declaration?.getKind() === ts.SyntaxKind.TypeLiteral) {
+    // Check if parent of type literal is an type alias
+    const parent = declaration.getParent();
+    if (!parent) return UNRESOLVED;
+    if (parent.getKind() === ts.SyntaxKind.TypeAliasDeclaration) {
+      return parent.getText();
+    }
   }
 
   return UNRESOLVED;
@@ -31,27 +39,23 @@ export function resolveType(
   declarations: { [key: string]: string }
 ) {
   const typeText = type.getText(undefined, TypeFormatFlags.NoTypeReduction);
-  console.log("typeText", typeText);
   if (declarations[typeText] && declarations[typeText] !== UNRESOLVED)
     return typeText;
   const declaration = getTypeDeclaration(type);
-  console.log("declaration", declaration);
-  if (declaration !== UNRESOLVED && declaration.startsWith("export")) {
-    declarations[typeText] = declaration;
-    console.log(typeText);
-    console.log(declaration);
-  }
+  if (declaration !== UNRESOLVED) declarations[typeText] = declaration;
 
   if (type.isIntersection()) {
     for (const t of type.getIntersectionTypes()) {
       resolveType(t, declarations);
     }
   }
+
   if (type.isUnion()) {
     for (const t of type.getUnionTypes()) {
       resolveType(t, declarations);
     }
   }
+
   if (type.isObject()) {
     for (const property of type.getProperties()) {
       const propertyType = property.getTypeAtLocation(
