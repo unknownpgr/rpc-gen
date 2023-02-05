@@ -1,8 +1,13 @@
-import { InterfaceDeclaration, ts, Type, TypeFormatFlags } from "ts-morph";
+import { ts, Type, TypeFormatFlags } from "ts-morph";
 
 function getTypeDeclaration(type: Type) {
   // Check if type is primitive
   if (type.isString() || type.isNumber() || type.isBoolean()) {
+    return UNRESOLVED;
+  }
+
+  // Check if given type is array
+  if (type.isArray()) {
     return UNRESOLVED;
   }
 
@@ -28,6 +33,7 @@ function getTypeDeclaration(type: Type) {
   if (!symbol) return UNRESOLVED;
 
   const declaration = symbol.getDeclarations()[0];
+  // console.log(declaration?.getKindName());
 
   // Check if given declaration is an interface
   if (declaration?.getKind() === ts.SyntaxKind.InterfaceDeclaration) {
@@ -37,6 +43,16 @@ function getTypeDeclaration(type: Type) {
   // Check if given declaration is a type literal
   if (declaration?.getKind() === ts.SyntaxKind.TypeLiteral) {
     // Check if parent of type literal is an type alias
+    const parent = declaration.getParent();
+    if (!parent) return UNRESOLVED;
+    if (parent.getKind() === ts.SyntaxKind.TypeAliasDeclaration) {
+      return parent.getText();
+    }
+  }
+
+  // Check if given declaration is a mapped type
+  if (declaration?.getKind() === ts.SyntaxKind.MappedType) {
+    // Check if parent of mapped type is an type alias
     const parent = declaration.getParent();
     if (!parent) return UNRESOLVED;
     if (parent.getKind() === ts.SyntaxKind.TypeAliasDeclaration) {
@@ -54,7 +70,7 @@ export function resolveType(
   declarations: { [key: string]: string }
 ) {
   const typeText = type.getText(undefined, TypeFormatFlags.NoTypeReduction);
-  console.log(typeText);
+  // console.log(typeText);
   if (declarations[typeText] && declarations[typeText] !== UNRESOLVED)
     return typeText;
   const declaration = getTypeDeclaration(type);

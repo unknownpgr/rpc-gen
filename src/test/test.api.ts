@@ -22,10 +22,18 @@ interface MoreComplexInterface {
   })[];
 }
 
+type SexyType = {
+  [key in keyof MoreComplexInterface]: MoreComplexInterface[keyof MoreComplexInterface];
+};
+
+type ASDFType = keyof MoreComplexInterface;
+
 export const rpc = async (
   context: RpcContext,
   e: MoreComplexInterface,
-  f: MoreAbsolutelyNothing
+  f: MoreAbsolutelyNothing,
+  g: SexyType,
+  h: ASDFType
 ) => {
   return e;
 };
