@@ -6,8 +6,23 @@ function getTypeDeclaration(type: Type) {
     return UNRESOLVED;
   }
 
-  // Check if type is promise
-  if (type.getText().startsWith("Promise<")) return UNRESOLVED;
+  // List of native generic types like Array, Promise, Set, Map, etc.
+  const nativeGenerics = [
+    "Array",
+    "Promise",
+    "Set",
+    "Map",
+    "ReadonlyArray",
+    "ReadonlySet",
+    "ReadonlyMap",
+  ];
+
+  // Check if typeText starts with any of the native generics+<
+  if (
+    nativeGenerics.some((generic) => type.getText().startsWith(`${generic}<`))
+  ) {
+    return UNRESOLVED;
+  }
 
   const symbol = type.getSymbol();
   if (!symbol) return UNRESOLVED;
@@ -39,24 +54,34 @@ export function resolveType(
   declarations: { [key: string]: string }
 ) {
   const typeText = type.getText(undefined, TypeFormatFlags.NoTypeReduction);
+  console.log(typeText);
   if (declarations[typeText] && declarations[typeText] !== UNRESOLVED)
     return typeText;
   const declaration = getTypeDeclaration(type);
   if (declaration !== UNRESOLVED) declarations[typeText] = declaration;
 
-  if (type.isIntersection()) {
+  // Check if type is generic
+  if (type.getTypeArguments().length > 0) {
+    for (const typeArgument of type.getTypeArguments()) {
+      resolveType(typeArgument, declarations);
+    }
+  }
+  if (type.isArray()) {
+    const elementType = type.getArrayElementType();
+    if (elementType) resolveType(elementType, declarations);
+  } else if (type.isTuple()) {
+    for (const elementType of type.getTupleElements()) {
+      resolveType(elementType, declarations);
+    }
+  } else if (type.isIntersection()) {
     for (const t of type.getIntersectionTypes()) {
       resolveType(t, declarations);
     }
-  }
-
-  if (type.isUnion()) {
+  } else if (type.isUnion()) {
     for (const t of type.getUnionTypes()) {
       resolveType(t, declarations);
     }
-  }
-
-  if (type.isObject()) {
+  } else if (type.isObject()) {
     for (const property of type.getProperties()) {
       const propertyType = property.getTypeAtLocation(
         property.getDeclarations()[0]

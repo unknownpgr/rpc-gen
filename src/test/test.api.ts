@@ -17,16 +17,15 @@ interface MoreComplexInterface {
   a: string;
   b: number;
   c: boolean;
-  d: ComplexInterface & {
+  d: (ComplexInterface & {
     h: string;
-  };
+  })[];
 }
 
 export const rpc = async (
   context: RpcContext,
   e: MoreComplexInterface,
   f: MoreAbsolutelyNothing
-  g: Type
 ) => {
   return e;
 };
