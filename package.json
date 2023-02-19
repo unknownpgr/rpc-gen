@@ -11,9 +11,10 @@
   },
   "homepage": "https://github.com/unknownpgr/rpc",
   "scripts": {
-    "build": "tsc",
-    "preversion": "rm -rf lib; yarn build; git add -A lib; git diff-index --quiet HEAD || git commit -m \"build\"",
-    "patch": "git add .; git diff-index --quiet HEAD || git commit -m \"patch\"; npm version patch"
+    "build": "rm -r lib; tsc",
+    "preversion": "yarn build; git add -A lib; git diff-index --quiet HEAD || git commit -m \"build\"",
+    "patch": "git add .; git diff-index --quiet HEAD || git commit -m \"patch\"; npm version patch",
+    "test": "yarn build; node cli.js"
   },
   "dependencies": {
     "args": "^5.0.3",
