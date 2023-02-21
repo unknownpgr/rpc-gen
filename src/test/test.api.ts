@@ -1,5 +1,5 @@
-import { RpcContext } from "src";
 import { MoreAbsolutelyNothing } from "src/test/otherfile";
+import { RpcContext } from "src";
 import { Type } from "ts-morph";
 
 interface ComplexInterface {
@@ -37,3 +37,23 @@ export const rpc = async (
 ) => {
   return e;
 };
+
+export function rpc2(context: RpcContext): Omit<MoreComplexInterface, "a"> {
+  return {
+    b: 1,
+    c: true,
+    d: [
+      {
+        a: "a",
+        b: 1,
+        c: true,
+        d: {
+          e: "e",
+          f: 1,
+          g: true,
+        },
+        h: "h",
+      },
+    ],
+  };
+}
