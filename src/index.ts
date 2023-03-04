@@ -49,17 +49,20 @@ export function generate(config: RpcGenConfig) {
         hash,
         args,
         }),
-    }).then((res) => res.json());
-    };`;
+    }).then((res) => res.json())
+    .then((res) => {
+        if (res.type === "error") {
+        throw new Error(res.message);
+        } else {
+        return JSON.parse(res.data);
+        }
+    });}`;
 
   let backendFile = 'import { RpcContext } from "rpc-gen";\n';
+  backendFile += 'import { handler } from "rpc-gen/server";\n';
   backendFile += `export const rpc = async (context:RpcContext, { module, func, hash, args }: { module: string, func: string, hash: number, args: any[] }) => {
     const moduleObj = modules[module];
-    if (!moduleObj) throw new Error("Module not found");
-    const funcObj = moduleObj[func];
-    if (!funcObj) throw new Error("Function not found");
-    if (funcObj.hash !== hash) throw new Error("Hash mismatch");
-    return await funcObj.func(context, ...args);
+    return handler(moduleObj, func, hash, args);
     };`;
   backendFile +=
     "const modules: { [key: string]: { [key: string]: { hash: number, func: (...args: any[]) => any } }} = {\n";
