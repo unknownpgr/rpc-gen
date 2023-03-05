@@ -1,4 +1,4 @@
-import { RpcContext } from "src/global";
+import { RpcContext } from "./";
 
 type RpcErrorType = {
   type: "error";

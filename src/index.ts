@@ -11,6 +11,8 @@ import { TypeFormatFlags } from "typescript";
 import { getFunctionDeclarations } from "./getFunctionDeclarations";
 import { resolveType } from "./resolver";
 
+export interface RpcContext {}
+
 export interface RpcGenConfig {
   rpcApiUrl: string;
   frontendFile: string;
