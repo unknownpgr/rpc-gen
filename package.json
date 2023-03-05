@@ -14,7 +14,7 @@
     "build": "rm -r lib; tsc",
     "preversion": "yarn build; git add -A lib; git diff-index --quiet HEAD || git commit -m \"build\"",
     "patch": "git add .; git diff-index --quiet HEAD || git commit -m \"patch\"; npm version patch",
-    "test": "yarn build; node cli.js"
+    "test": "docker build -t test test; docker run --rm -it -v $(pwd)/test/output:/app/output test"
   },
   "dependencies": {
     "args": "^5.0.3",
