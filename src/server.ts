@@ -1,14 +1,26 @@
-function getErrorObject(message: string) {
+import { RpcContext } from "src/global";
+
+type RpcErrorType = {
+  type: "error";
+  message: string;
+};
+
+type RpcSuccessType = {
+  type: "success";
+  data: any;
+};
+
+function getErrorObject(message: string): RpcErrorType {
   return {
     type: "error",
     message,
   };
 }
 
-function getSuccessObject(data: any) {
+function getSuccessObject(data: any): RpcSuccessType {
   return {
     type: "success",
-    data: JSON.stringify(data),
+    data,
   };
 }
 
@@ -29,3 +41,19 @@ export async function handler(
     return getErrorObject(e.message);
   }
 }
+
+export type RpcModule = {
+  [key: string]: {
+    [key: string]: { hash: number; func: (...args: any[]) => any };
+  };
+};
+
+export type RpcFunction = (
+  context: RpcContext,
+  {
+    module,
+    func,
+    hash,
+    args,
+  }: { module: string; func: string; hash: number; args: any[] }
+) => Promise<RpcErrorType | RpcSuccessType>;

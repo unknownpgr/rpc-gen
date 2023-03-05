@@ -54,18 +54,18 @@ export function generate(config: RpcGenConfig) {
         if (res.type === "error") {
         throw new Error(res.message);
         } else {
-        return JSON.parse(res.data);
+        return res.data;
         }
-    });}`;
+    });};`;
 
   let backendFile = 'import { RpcContext } from "rpc-gen";\n';
-  backendFile += 'import { handler } from "rpc-gen/server";\n';
-  backendFile += `export const rpc = async (context:RpcContext, { module, func, hash, args }: { module: string, func: string, hash: number, args: any[] }) => {
+  backendFile +=
+    'import { handler, RpcModule, RpcFunction } from "rpc-gen/server";\n';
+  backendFile += `export const rpc: RpcFunction = async (context, { module, func, hash, args }) => {
     const moduleObj = modules[module];
     return handler(moduleObj, func, hash, args);
     };`;
-  backendFile +=
-    "const modules: { [key: string]: { [key: string]: { hash: number, func: (...args: any[]) => any } }} = {\n";
+  backendFile += "const modules: RpcModule = {\n";
 
   const backendImports = [];
   const moduleNames = new Set<string>();
