@@ -62,7 +62,7 @@ export function generate(config: RpcGenConfig) {
 
   let backendFile = 'import { RpcContext } from "rpc-gen";\n';
   backendFile +=
-    'import { handler, RpcModule, RpcFunction } from "rpc-gen/server";\n';
+    'import { handler, RpcModule, RpcFunction } from "rpc-gen/lib/server";\n';
   backendFile += `export const rpc: RpcFunction = async (context, { module, func, hash, args }) => {
     const moduleObj = modules[module];
     return handler(moduleObj, func, hash, args);
