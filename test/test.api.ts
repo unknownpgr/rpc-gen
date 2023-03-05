@@ -1,5 +1,5 @@
-import { MoreAbsolutelyNothing } from "src/test/otherfile";
-import { RpcContext } from "src";
+import { MoreAbsolutelyNothing } from "./otherfile";
+import { RpcContext } from "rpc-gen";
 import { Type } from "ts-morph";
 
 interface ComplexInterface {
