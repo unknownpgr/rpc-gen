@@ -6,5 +6,8 @@
     "mhutchie.git-graph",
     "streetsidesoftware.code-spell-checker",
     "GitHub.copilot"
-  ]
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  }
 }
